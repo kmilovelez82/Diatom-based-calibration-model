@@ -1,0 +1,61 @@
+---
+title: "Diatom-based Calibration Model"
+author: "Vélez-Agudelo Camilo"
+date: "8/3/2022"
+output:
+  html_notebook:
+    code_folding: "show"
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, echo = TRUE, message = FALSE, warning = FALSE)
+
+library(tidyverse)
+library(vegan)
+library(rioja)
+library(ggplot2)
+library(ggpubr)
+library(kableExtra)
+library(gridExtra)
+library(rstatix)
+```
+
+# **Preprocessing Data** #
+```{r Loading.data}
+
+speciesRC <- readRDS("speciesRC.rds") ##Colorado River Diatom Data##
+speciesRN <- readRDS("speciesRN.rds") ##Negro River Diatom Data##
+speciesCH <- readRDS("speciesCH.rds") ##Chubut River Diatom Data##
+
+names <- readRDS("names.code.rds")   ##Species name code## 
+
+chem <- readRDS("chem.rds")          ##Hidrochemical variables##
+```
+
+```{r Combining.data}
+colnames(speciesRC) <- names[[1]][, 2]
+colnames(speciesRN) <- names[[2]][, 2]
+colnames(speciesCH) <- names[[3]][, 2]
+
+species.complete <- Merge(
+  speciesRC,
+  speciesRN,
+  speciesCH
+)
+
+##Filter data by inland species##
+species.inland <- species.complete[-c(1:3, 16:18, 34:38),]
+species.inland <- species.inland[, colSums(species.inland) > 0]
+
+##Hydochemical variables in inland sites##
+chem.inland <- chem[-c(1:3, 16:18, 34:38),]
+```
+
+
+
+
+
+
+
