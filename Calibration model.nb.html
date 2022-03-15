@@ -2889,11 +2889,12 @@ div.tocify {
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-text-begin -->
+<p>A series of WA and WA-PLS models were developed using the screened data set (38 sampling sites and 45 diatom taxa) to identify the best calibration model that allows reliable conductivity reconstructions in northern Patagonia.</p>
 <div id="preprocessing-data" class="section level1">
 <h1><strong>Preprocessing Data</strong></h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5zcGVjaWVzUkMgPC0gcmVhZFJEUyhcInNwZWNpZXNSQy5yZHNcIikgIyNDb2xvcmFkbyBSaXZlciBEaWF0b20gRGF0YSMjXG5zcGVjaWVzUk4gPC0gcmVhZFJEUyhcInNwZWNpZXNSTi5yZHNcIikgIyNOZWdybyBSaXZlciBEaWF0b20gRGF0YSMjXG5zcGVjaWVzQ0ggPC0gcmVhZFJEUyhcInNwZWNpZXNDSC5yZHNcIikgIyNDaHVidXQgUml2ZXIgRGlhdG9tIERhdGEjI1xuXG5uYW1lcyA8LSByZWFkUkRTKFwibmFtZXMuY29kZS5yZHNcIikgICAjI1NwZWNpZXMgbmFtZSBjb2RlIyMgXG5cbmNoZW0gPC0gcmVhZFJEUyhcImNoZW0ucmRzXCIpICAgICAgICAgICMjSGlkcm9jaGVtaWNhbCB2YXJpYWJsZXMjI1xuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5zcGVjaWVzUkMgPC0gcmVhZFJEUyhcInNwZWNpZXNSQy5yZHNcIikgIyNDb2xvcmFkbyBSaXZlciBEaWF0b20gRGF0YSMjXG5zcGVjaWVzUk4gPC0gcmVhZFJEUyhcInNwZWNpZXNSTi5yZHNcIikgIyNOZWdybyBSaXZlciBEaWF0b20gRGF0YSMjXG5zcGVjaWVzQ0ggPC0gcmVhZFJEUyhcInNwZWNpZXNDSC5yZHNcIikgIyNDaHVidXQgUml2ZXIgRGlhdG9tIERhdGEjI1xuXG5uYW1lcyA8LSByZWFkUkRTKFwibmFtZXMuY29kZS5yZHNcIikgICAjI1NwZWNpZXMgbmFtZSBjb2RlIyMgXG5cbnZhcmFtIDwtIHJlYWRSRFMoXCJ2YXJhbS5yZHNcIilcbmNoZW0gPC0gcmVhZFJEUyhcImNoZW0ucmRzXCIpICAgICAgICAgICMjSGlkcm9jaGVtaWNhbCB2YXJpYWJsZXMgTG9nLVRyYW5zZm9ybWVkIyNcbmBgYCJ9 -->
 <pre class="r"><code>
 speciesRC &lt;- readRDS(&quot;speciesRC.rds&quot;) ##Colorado River Diatom Data##
 speciesRN &lt;- readRDS(&quot;speciesRN.rds&quot;) ##Negro River Diatom Data##
@@ -2901,7 +2902,8 @@ speciesCH &lt;- readRDS(&quot;speciesCH.rds&quot;) ##Chubut River Diatom Data##
 
 names &lt;- readRDS(&quot;names.code.rds&quot;)   ##Species name code## 
 
-chem &lt;- readRDS(&quot;chem.rds&quot;)          ##Hidrochemical variables##</code></pre>
+varam &lt;- readRDS(&quot;varam.rds&quot;)
+chem &lt;- readRDS(&quot;chem.rds&quot;)          ##Hidrochemical variables Log-Transformed##</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -2928,9 +2930,564 @@ chem.inland &lt;- chem[-c(1:3, 16:18, 34:38),]</code></pre>
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5zcGVjaWVzLmlubGFuZC5oZWwgPC0gZGVjb3N0YW5kKHNwZWNpZXMuaW5sYW5kLCBcImhlbGxpbmdlclwiKVxuc3BlY2llcy5pbmxhbmQuc3FydCA8LSBzcXJ0KHNwZWNpZXMuaW5sYW5kKVxuc3BlY2llcy5pbmxhbmQubG9nIDwtIGxvZzFwKHNwZWNpZXMuaW5sYW5kKVxuYGBgIn0= -->
+<pre class="r"><code>
+species.inland.hel &lt;- decostand(species.inland, &quot;hellinger&quot;)
+species.inland.sqrt &lt;- sqrt(species.inland)
+species.inland.log &lt;- log1p(species.inland)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="weighted-averaging" class="section level1">
+<h1><strong>Weighted Averaging</strong></h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kMSA8LSBXQShcbiAgc3BlY2llcy5pbmxhbmQuaGVsLCAjI0hlbGxpbmdlciB0cmFuZm9ybWVkIyNcbiAgY2hlbS5pbmxhbmQkQ29uZCxcbiAgdG9sRFc9VFJVRVxuICApXG5cbm1vZDIgPC0gV0EoXG4gIHNwZWNpZXMuaW5sYW5kLnNxcnQsICMjU3F1YXJlLXJvb3QgdHJhbmZvcm1lZCMjXG4gIGNoZW0uaW5sYW5kJENvbmQsXG4gIHRvbERXPVRSVUVcbiAgKVxuXG5tb2QzIDwtIFdBKFxuICBzcGVjaWVzLmlubGFuZC5sb2csICMjTG9nLXRyYW5mb3JtZWQjI1xuICBjaGVtLmlubGFuZCRDb25kLFxuICB0b2xEVz1UUlVFXG4gIClcbmBgYCJ9 -->
+<pre class="r"><code>mod1 &lt;- WA(
+  species.inland.hel, ##Hellinger tranformed##
+  chem.inland$Cond,
+  tolDW=TRUE
+  )
+
+mod2 &lt;- WA(
+  species.inland.sqrt, ##Square-root tranformed##
+  chem.inland$Cond,
+  tolDW=TRUE
+  )
+
+mod3 &lt;- WA(
+  species.inland.log, ##Log-tranformed##
+  chem.inland$Cond,
+  tolDW=TRUE
+  )</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGxlYXZlLW9uZS1vdXQjI1xubW9kMS54djEgPC0gY3Jvc3N2YWwobW9kMSwgY3YubWV0aG9kID0gXCJsb29cIilcbmBgYCJ9 -->
+<pre class="r"><code>##Cross-validation using leave-one-out##
+mod1.xv1 &lt;- crossval(mod1, cv.method = &quot;loo&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kMS54djFcbmBgYCJ9 -->
+<pre class="r"><code>mod1.xv1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5NZXRob2QgOiBXZWlnaHRlZCBBdmVyYWdpbmdcbkNhbGwgICA6IFdBKHkgPSBzcGVjaWVzLmlubGFuZC5oZWwsIHggPSBjaGVtLmlubGFuZCRDb25kLCB0b2xEVyA9IFRSVUUpIFxuXG5Ub2xlcmFuY2UgRFcgICAgICAgOiBZZXMgXG5Nb25vdG9uaWMgZGVzaHJpbmsgOiBObyBcbk5vLiBzYW1wbGVzICAgICAgICA6IDM4IFxuTm8uIHNwZWNpZXMgICAgICAgIDogODQgXG5Dcm9zcyB2YWwuICAgICAgICAgOiBsb28gXG5cbkRlc2hyaW5raW5nIHJlZ3Jlc3Npb24gY29lZmZpY2llbnRzOlxuICAgICAgICAgIEludmVyc2UgZC9zIENsYXNzaWNhbCBkL3NcbndhLmIwICAgICAgICAgLTAuMzg1OSAgICAgICAgMC4xOTM2XG53YS5iMSAgICAgICAgICAyLjA4NDggICAgICAgIDAuNDU5NFxud2EudG9sLmIwICAgICAtMC4wMTgyICAgICAgICAwLjAyMjlcbndhLnRvbC5iMSAgICAgIDEuMDY0MSAgICAgICAgMC45MjU4XG5cblBlcmZvcm1hbmNlOlxuICAgICAgICAgICAgICAgICAgIFJNU0UgICAgICBSMiAgQXZnLkJpYXMgIE1heC5CaWFzICAgIFNraWxsXG5XQS5pbnYgICAgICAgICAgIDAuMDcyNSAgMC45NTc4ICAgIDAuMDAwMCAgICAwLjI0NzIgIDk1Ljc4MjVcbldBLmNsYSAgICAgICAgICAgMC4wNzQxICAwLjk1NzggICAgMC4wMDAwICAgIDAuMjcyNCAgOTUuNTk2OFxuV0EuaW52LnRvbCAgICAgICAwLjA0MzEgIDAuOTg1MSAgICAwLjAwMDAgICAgMC4xNTAzICA5OC41MDc2XG5XQS5jbGEudG9sICAgICAgIDAuMDQzNSAgMC45ODUxICAgIDAuMDAwMCAgICAwLjE1NzUgIDk4LjQ4NDlcbldBLmludl9YVmFsICAgICAgMC4wODA4ICAwLjk0NzYgICAtMC4wMDE5ICAgIDAuMjc2OCAgOTQuNzU2MlxuV0EuY2xhX1hWYWwgICAgICAwLjA4MTIgIDAuOTQ4OSAgIC0wLjAwMjEgICAgMC4yOTQ3ICA5NC43MDczXG5XQS5pbnYudG9sX1hWYWwgIDAuMDUyMSAgMC45NzgyICAgLTAuMDAwNCAgICAwLjE4OTYgIDk3LjgxOTBcbldBLmNsYS50b2xfWFZhbCAgMC4wNTI0ICAwLjk3ODQgICAtMC4wMDA3ICAgIDAuMTk1MyAgOTcuNzk3MlxuIn0= -->
+<pre><code>
+Method : Weighted Averaging
+Call   : WA(y = species.inland.hel, x = chem.inland$Cond, tolDW = TRUE) 
+
+Tolerance DW       : Yes 
+Monotonic deshrink : No 
+No. samples        : 38 
+No. species        : 84 
+Cross val.         : loo 
+
+Deshrinking regression coefficients:
+          Inverse d/s Classical d/s
+wa.b0         -0.3859        0.1936
+wa.b1          2.0848        0.4594
+wa.tol.b0     -0.0182        0.0229
+wa.tol.b1      1.0641        0.9258
+
+Performance:
+                   RMSE      R2  Avg.Bias  Max.Bias    Skill
+WA.inv           0.0725  0.9578    0.0000    0.2472  95.7825
+WA.cla           0.0741  0.9578    0.0000    0.2724  95.5968
+WA.inv.tol       0.0431  0.9851    0.0000    0.1503  98.5076
+WA.cla.tol       0.0435  0.9851    0.0000    0.1575  98.4849
+WA.inv_XVal      0.0808  0.9476   -0.0019    0.2768  94.7562
+WA.cla_XVal      0.0812  0.9489   -0.0021    0.2947  94.7073
+WA.inv.tol_XVal  0.0521  0.9782   -0.0004    0.1896  97.8190
+WA.cla.tol_XVal  0.0524  0.9784   -0.0007    0.1953  97.7972</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGJvb3RzdHJhcGluZyMjXG5tb2QxLnh2MiA8LSBjcm9zc3ZhbChtb2QxLCBjdi5tZXRob2QgPSBcImJvb3RcIiwgbmJvb3QgPSAxMDAwKVxuYGBgIn0= -->
+<pre class="r"><code>##Cross-validation using bootstraping##
+mod1.xv2 &lt;- crossval(mod1, cv.method = &quot;boot&quot;, nboot = 1000)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kMS54djJcbmBgYCJ9 -->
+<pre class="r"><code>mod1.xv2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5NZXRob2QgOiBXZWlnaHRlZCBBdmVyYWdpbmdcbkNhbGwgICA6IFdBKHkgPSBzcGVjaWVzLmlubGFuZC5oZWwsIHggPSBjaGVtLmlubGFuZCRDb25kLCB0b2xEVyA9IFRSVUUpIFxuXG5Ub2xlcmFuY2UgRFcgICAgICAgOiBZZXMgXG5Nb25vdG9uaWMgZGVzaHJpbmsgOiBObyBcbk5vLiBzYW1wbGVzICAgICAgICA6IDM4IFxuTm8uIHNwZWNpZXMgICAgICAgIDogODQgXG5Dcm9zcyB2YWwuICAgICAgICAgOiBib290c3RyYXAgOiBuby4gYm9vdCBjeWNsZXMgPSAgMTAwMCBcblxuRGVzaHJpbmtpbmcgcmVncmVzc2lvbiBjb2VmZmljaWVudHM6XG4gICAgICAgICAgSW52ZXJzZSBkL3MgQ2xhc3NpY2FsIGQvc1xud2EuYjAgICAgICAgICAtMC4zODU5ICAgICAgICAwLjE5MzZcbndhLmIxICAgICAgICAgIDIuMDg0OCAgICAgICAgMC40NTk0XG53YS50b2wuYjAgICAgIC0wLjAxODIgICAgICAgIDAuMDIyOVxud2EudG9sLmIxICAgICAgMS4wNjQxICAgICAgICAwLjkyNThcblxuUGVyZm9ybWFuY2U6XG4gICAgICAgICAgICAgICAgICAgUk1TRSAgICAgIFIyICBBdmcuQmlhcyAgTWF4LkJpYXMgICAgU2tpbGxcbldBLmludiAgICAgICAgICAgMC4wNzI1ICAwLjk1NzggICAgMC4wMDAwICAgIDAuMjQ3MiAgOTUuNzgyNVxuV0EuY2xhICAgICAgICAgICAwLjA3NDEgIDAuOTU3OCAgICAwLjAwMDAgICAgMC4yNzI0ICA5NS41OTY4XG5XQS5pbnYudG9sICAgICAgIDAuMDQzMSAgMC45ODUxICAgIDAuMDAwMCAgICAwLjE1MDMgIDk4LjUwNzZcbldBLmNsYS50b2wgICAgICAgMC4wNDM1ICAwLjk4NTEgICAgMC4wMDAwICAgIDAuMTU3NSAgOTguNDg0OVxuV0EuaW52X1hWYWwgICAgICAwLjA4MzcgIDAuOTQ4OSAgIC0wLjAwNDEgICAgMC4yNzM3ICA5NC44NzAyXG5XQS5jbGFfWFZhbCAgICAgIDAuMDgzNCAgMC45NTAwICAgLTAuMDA0NCAgICAwLjI5MDkgIDk0Ljg3NjBcbldBLmludi50b2xfWFZhbCAgMC4wNTkxICAwLjk3NjggICAgMC4wMDEzICAgIDAuMTk2MSAgOTcuNjc4MVxuV0EuY2xhLnRvbF9YVmFsICAwLjA1OTAgIDAuOTc3MSAgICAwLjAwMTEgICAgMC4yMDE3ICA5Ny42NzUxXG4ifQ== -->
+<pre><code>
+Method : Weighted Averaging
+Call   : WA(y = species.inland.hel, x = chem.inland$Cond, tolDW = TRUE) 
+
+Tolerance DW       : Yes 
+Monotonic deshrink : No 
+No. samples        : 38 
+No. species        : 84 
+Cross val.         : bootstrap : no. boot cycles =  1000 
+
+Deshrinking regression coefficients:
+          Inverse d/s Classical d/s
+wa.b0         -0.3859        0.1936
+wa.b1          2.0848        0.4594
+wa.tol.b0     -0.0182        0.0229
+wa.tol.b1      1.0641        0.9258
+
+Performance:
+                   RMSE      R2  Avg.Bias  Max.Bias    Skill
+WA.inv           0.0725  0.9578    0.0000    0.2472  95.7825
+WA.cla           0.0741  0.9578    0.0000    0.2724  95.5968
+WA.inv.tol       0.0431  0.9851    0.0000    0.1503  98.5076
+WA.cla.tol       0.0435  0.9851    0.0000    0.1575  98.4849
+WA.inv_XVal      0.0837  0.9489   -0.0041    0.2737  94.8702
+WA.cla_XVal      0.0834  0.9500   -0.0044    0.2909  94.8760
+WA.inv.tol_XVal  0.0591  0.9768    0.0013    0.1961  97.6781
+WA.cla.tol_XVal  0.0590  0.9771    0.0011    0.2017  97.6751</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGxlYXZlLW9uZS1vdXQjI1xubW9kMi54djEgPC0gY3Jvc3N2YWwobW9kMiwgY3YubWV0aG9kID0gXCJsb29cIilcbmBgYCJ9 -->
+<pre class="r"><code>##Cross-validation using leave-one-out##
+mod2.xv1 &lt;- crossval(mod2, cv.method = &quot;loo&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kMi54djFcbmBgYCJ9 -->
+<pre class="r"><code>mod2.xv1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5NZXRob2QgOiBXZWlnaHRlZCBBdmVyYWdpbmdcbkNhbGwgICA6IFdBKHkgPSBzcGVjaWVzLmlubGFuZC5zcXJ0LCB4ID0gY2hlbS5pbmxhbmQkQ29uZCwgdG9sRFcgPSBUUlVFKSBcblxuVG9sZXJhbmNlIERXICAgICAgIDogWWVzIFxuTW9ub3RvbmljIGRlc2hyaW5rIDogTm8gXG5Oby4gc2FtcGxlcyAgICAgICAgOiAzOCBcbk5vLiBzcGVjaWVzICAgICAgICA6IDg0IFxuQ3Jvc3MgdmFsLiAgICAgICAgIDogbG9vIFxuXG5EZXNocmlua2luZyByZWdyZXNzaW9uIGNvZWZmaWNpZW50czpcbiAgICAgICAgICBJbnZlcnNlIGQvcyBDbGFzc2ljYWwgZC9zXG53YS5iMCAgICAgICAgIC0wLjM4NDggICAgICAgIDAuMTk0NFxud2EuYjEgICAgICAgICAgMi4wNzA5ICAgICAgICAwLjQ2MjVcbndhLnRvbC5iMCAgICAgLTAuMDE3NiAgICAgICAgMC4wMjI1XG53YS50b2wuYjEgICAgICAxLjA2MjEgICAgICAgIDAuOTI3NVxuXG5QZXJmb3JtYW5jZTpcbiAgICAgICAgICAgICAgICAgICBSTVNFICAgICAgUjIgIEF2Zy5CaWFzICBNYXguQmlhcyAgICBTa2lsbFxuV0EuaW52ICAgICAgICAgICAwLjA3MjYgIDAuOTU3OCAgICAwLjAwMDAgICAgMC4yNDY4ICA5NS43NzUyXG5XQS5jbGEgICAgICAgICAgIDAuMDc0MSAgMC45NTc4ICAgIDAuMDAwMCAgICAwLjI3MjEgIDk1LjU4ODhcbldBLmludi50b2wgICAgICAgMC4wNDMxICAwLjk4NTEgICAgMC4wMDAwICAgIDAuMTUwOSAgOTguNTA5M1xuV0EuY2xhLnRvbCAgICAgICAwLjA0MzQgIDAuOTg1MSAgICAwLjAwMDAgICAgMC4xNTgxICA5OC40ODY4XG5XQS5pbnZfWFZhbCAgICAgIDAuMDgwOSAgMC45NDc1ICAgLTAuMDAyMCAgICAwLjI3NjQgIDk0Ljc0NThcbldBLmNsYV9YVmFsICAgICAgMC4wODEzICAwLjk0ODggICAtMC4wMDIxICAgIDAuMjk0MyAgOTQuNjk1N1xuV0EuaW52LnRvbF9YVmFsICAwLjA1MjEgIDAuOTc4MyAgIC0wLjAwMDQgICAgMC4xOTAxICA5Ny44MjQ4XG5XQS5jbGEudG9sX1hWYWwgIDAuMDUyMyAgMC45Nzg1ICAgLTAuMDAwNyAgICAwLjE5NTggIDk3LjgwMjhcbiJ9 -->
+<pre><code>
+Method : Weighted Averaging
+Call   : WA(y = species.inland.sqrt, x = chem.inland$Cond, tolDW = TRUE) 
+
+Tolerance DW       : Yes 
+Monotonic deshrink : No 
+No. samples        : 38 
+No. species        : 84 
+Cross val.         : loo 
+
+Deshrinking regression coefficients:
+          Inverse d/s Classical d/s
+wa.b0         -0.3848        0.1944
+wa.b1          2.0709        0.4625
+wa.tol.b0     -0.0176        0.0225
+wa.tol.b1      1.0621        0.9275
+
+Performance:
+                   RMSE      R2  Avg.Bias  Max.Bias    Skill
+WA.inv           0.0726  0.9578    0.0000    0.2468  95.7752
+WA.cla           0.0741  0.9578    0.0000    0.2721  95.5888
+WA.inv.tol       0.0431  0.9851    0.0000    0.1509  98.5093
+WA.cla.tol       0.0434  0.9851    0.0000    0.1581  98.4868
+WA.inv_XVal      0.0809  0.9475   -0.0020    0.2764  94.7458
+WA.cla_XVal      0.0813  0.9488   -0.0021    0.2943  94.6957
+WA.inv.tol_XVal  0.0521  0.9783   -0.0004    0.1901  97.8248
+WA.cla.tol_XVal  0.0523  0.9785   -0.0007    0.1958  97.8028</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGJvb3RzdHJhcGluZyMjXG5tb2QyLnh2MiA8LSBjcm9zc3ZhbChtb2QyLCBjdi5tZXRob2QgPSBcImJvb3RcIiwgbmJvb3QgPSAxMDAwKSBcbmBgYCJ9 -->
+<pre class="r"><code>##Cross-validation using bootstraping##
+mod2.xv2 &lt;- crossval(mod2, cv.method = &quot;boot&quot;, nboot = 1000) </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kMi54djJcbmBgYCJ9 -->
+<pre class="r"><code>mod2.xv2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5NZXRob2QgOiBXZWlnaHRlZCBBdmVyYWdpbmdcbkNhbGwgICA6IFdBKHkgPSBzcGVjaWVzLmlubGFuZC5zcXJ0LCB4ID0gY2hlbS5pbmxhbmQkQ29uZCwgdG9sRFcgPSBUUlVFKSBcblxuVG9sZXJhbmNlIERXICAgICAgIDogWWVzIFxuTW9ub3RvbmljIGRlc2hyaW5rIDogTm8gXG5Oby4gc2FtcGxlcyAgICAgICAgOiAzOCBcbk5vLiBzcGVjaWVzICAgICAgICA6IDg0IFxuQ3Jvc3MgdmFsLiAgICAgICAgIDogYm9vdHN0cmFwIDogbm8uIGJvb3QgY3ljbGVzID0gIDEwMDAgXG5cbkRlc2hyaW5raW5nIHJlZ3Jlc3Npb24gY29lZmZpY2llbnRzOlxuICAgICAgICAgIEludmVyc2UgZC9zIENsYXNzaWNhbCBkL3NcbndhLmIwICAgICAgICAgLTAuMzg0OCAgICAgICAgMC4xOTQ0XG53YS5iMSAgICAgICAgICAyLjA3MDkgICAgICAgIDAuNDYyNVxud2EudG9sLmIwICAgICAtMC4wMTc2ICAgICAgICAwLjAyMjVcbndhLnRvbC5iMSAgICAgIDEuMDYyMSAgICAgICAgMC45Mjc1XG5cblBlcmZvcm1hbmNlOlxuICAgICAgICAgICAgICAgICAgIFJNU0UgICAgICBSMiAgQXZnLkJpYXMgIE1heC5CaWFzICAgIFNraWxsXG5XQS5pbnYgICAgICAgICAgIDAuMDcyNiAgMC45NTc4ICAgIDAuMDAwMCAgICAwLjI0NjggIDk1Ljc3NTJcbldBLmNsYSAgICAgICAgICAgMC4wNzQxICAwLjk1NzggICAgMC4wMDAwICAgIDAuMjcyMSAgOTUuNTg4OFxuV0EuaW52LnRvbCAgICAgICAwLjA0MzEgIDAuOTg1MSAgICAwLjAwMDAgICAgMC4xNTA5ICA5OC41MDkzXG5XQS5jbGEudG9sICAgICAgIDAuMDQzNCAgMC45ODUxICAgIDAuMDAwMCAgICAwLjE1ODEgIDk4LjQ4NjhcbldBLmludl9YVmFsICAgICAgMC4wODM5ICAwLjk0ODUgICAtMC4wMDQ3ICAgIDAuMjczOCAgOTQuODI4N1xuV0EuY2xhX1hWYWwgICAgICAwLjA4MzYgIDAuOTQ5NiAgIC0wLjAwNTAgICAgMC4yOTEyICA5NC44MzM2XG5XQS5pbnYudG9sX1hWYWwgIDAuMDU4MyAgMC45NzcxICAgLTAuMDAwMSAgICAwLjE5NjcgIDk3LjcwMjdcbldBLmNsYS50b2xfWFZhbCAgMC4wNTg0ICAwLjk3NzMgICAtMC4wMDAzICAgIDAuMjAyNCAgOTcuNjkwN1xuIn0= -->
+<pre><code>
+Method : Weighted Averaging
+Call   : WA(y = species.inland.sqrt, x = chem.inland$Cond, tolDW = TRUE) 
+
+Tolerance DW       : Yes 
+Monotonic deshrink : No 
+No. samples        : 38 
+No. species        : 84 
+Cross val.         : bootstrap : no. boot cycles =  1000 
+
+Deshrinking regression coefficients:
+          Inverse d/s Classical d/s
+wa.b0         -0.3848        0.1944
+wa.b1          2.0709        0.4625
+wa.tol.b0     -0.0176        0.0225
+wa.tol.b1      1.0621        0.9275
+
+Performance:
+                   RMSE      R2  Avg.Bias  Max.Bias    Skill
+WA.inv           0.0726  0.9578    0.0000    0.2468  95.7752
+WA.cla           0.0741  0.9578    0.0000    0.2721  95.5888
+WA.inv.tol       0.0431  0.9851    0.0000    0.1509  98.5093
+WA.cla.tol       0.0434  0.9851    0.0000    0.1581  98.4868
+WA.inv_XVal      0.0839  0.9485   -0.0047    0.2738  94.8287
+WA.cla_XVal      0.0836  0.9496   -0.0050    0.2912  94.8336
+WA.inv.tol_XVal  0.0583  0.9771   -0.0001    0.1967  97.7027
+WA.cla.tol_XVal  0.0584  0.9773   -0.0003    0.2024  97.6907</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGxlYXZlLW9uZS1vdXQjI1xubW9kMy54djEgPC0gY3Jvc3N2YWwobW9kMywgY3YubWV0aG9kID0gXCJsb29cIilcbmBgYCJ9 -->
+<pre class="r"><code>##Cross-validation using leave-one-out##
+mod3.xv1 &lt;- crossval(mod3, cv.method = &quot;loo&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kMy54djFcbmBgYCJ9 -->
+<pre class="r"><code>mod3.xv1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5NZXRob2QgOiBXZWlnaHRlZCBBdmVyYWdpbmdcbkNhbGwgICA6IFdBKHkgPSBzcGVjaWVzLmlubGFuZC5sb2csIHggPSBjaGVtLmlubGFuZCRDb25kLCB0b2xEVyA9IFRSVUUpIFxuXG5Ub2xlcmFuY2UgRFcgICAgICAgOiBZZXMgXG5Nb25vdG9uaWMgZGVzaHJpbmsgOiBObyBcbk5vLiBzYW1wbGVzICAgICAgICA6IDM4IFxuTm8uIHNwZWNpZXMgICAgICAgIDogODQgXG5Dcm9zcyB2YWwuICAgICAgICAgOiBsb28gXG5cbkRlc2hyaW5raW5nIHJlZ3Jlc3Npb24gY29lZmZpY2llbnRzOlxuICAgICAgICAgIEludmVyc2UgZC9zIENsYXNzaWNhbCBkL3NcbndhLmIwICAgICAgICAgLTAuNDA0NCAgICAgICAgMC4xOTc2XG53YS5iMSAgICAgICAgICAyLjE0MTcgICAgICAgIDAuNDQ2MFxud2EudG9sLmIwICAgICAtMC4wMTY5ICAgICAgICAwLjAyMjFcbndhLnRvbC5iMSAgICAgIDEuMDYwMyAgICAgICAgMC45Mjg1XG5cblBlcmZvcm1hbmNlOlxuICAgICAgICAgICAgICAgICAgIFJNU0UgICAgICBSMiAgQXZnLkJpYXMgIE1heC5CaWFzICAgIFNraWxsXG5XQS5pbnYgICAgICAgICAgIDAuMDc0NiAgMC45NTUzICAgIDAuMDAwMCAgICAwLjI1ODkgIDk1LjUyODhcbldBLmNsYSAgICAgICAgICAgMC4wNzY0ICAwLjk1NTMgICAgMC4wMDAwICAgIDAuMjg2MyAgOTUuMzE5NVxuV0EuaW52LnRvbCAgICAgICAwLjA0NDAgIDAuOTg0NCAgICAwLjAwMDAgICAgMC4xNTM3ICA5OC40NDQ2XG5XQS5jbGEudG9sICAgICAgIDAuMDQ0NCAgMC45ODQ0ICAgIDAuMDAwMCAgICAwLjE2MTMgIDk4LjQyMDBcbldBLmludl9YVmFsICAgICAgMC4wODM5ICAwLjk0MzUgICAtMC4wMDIwICAgIDAuMjkxNyAgOTQuMzQ4MFxuV0EuY2xhX1hWYWwgICAgICAwLjA4NDMgIDAuOTQ1MCAgIC0wLjAwMjIgICAgMC4zMTA4ICA5NC4yOTA4XG5XQS5pbnYudG9sX1hWYWwgIDAuMDU0NSAgMC45NzYyICAgLTAuMDAwNiAgICAwLjE5MzUgIDk3LjYxMjlcbldBLmNsYS50b2xfWFZhbCAgMC4wNTQ4ICAwLjk3NjQgICAtMC4wMDA5ICAgIDAuMTk4OSAgOTcuNTg5MVxuIn0= -->
+<pre><code>
+Method : Weighted Averaging
+Call   : WA(y = species.inland.log, x = chem.inland$Cond, tolDW = TRUE) 
+
+Tolerance DW       : Yes 
+Monotonic deshrink : No 
+No. samples        : 38 
+No. species        : 84 
+Cross val.         : loo 
+
+Deshrinking regression coefficients:
+          Inverse d/s Classical d/s
+wa.b0         -0.4044        0.1976
+wa.b1          2.1417        0.4460
+wa.tol.b0     -0.0169        0.0221
+wa.tol.b1      1.0603        0.9285
+
+Performance:
+                   RMSE      R2  Avg.Bias  Max.Bias    Skill
+WA.inv           0.0746  0.9553    0.0000    0.2589  95.5288
+WA.cla           0.0764  0.9553    0.0000    0.2863  95.3195
+WA.inv.tol       0.0440  0.9844    0.0000    0.1537  98.4446
+WA.cla.tol       0.0444  0.9844    0.0000    0.1613  98.4200
+WA.inv_XVal      0.0839  0.9435   -0.0020    0.2917  94.3480
+WA.cla_XVal      0.0843  0.9450   -0.0022    0.3108  94.2908
+WA.inv.tol_XVal  0.0545  0.9762   -0.0006    0.1935  97.6129
+WA.cla.tol_XVal  0.0548  0.9764   -0.0009    0.1989  97.5891</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIEJvb3N0cmFwaW5nIyNcbm1vZDMueHYyIDwtIGNyb3NzdmFsKG1vZDMsIGN2Lm1ldGhvZCA9IFwiYm9vdFwiLCBuYm9vdCA9IDEwMDApXG5gYGAifQ== -->
+<pre class="r"><code>##Cross-validation using Boostraping##
+mod3.xv2 &lt;- crossval(mod3, cv.method = &quot;boot&quot;, nboot = 1000)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kMy54djJcbmBgYCJ9 -->
+<pre class="r"><code>mod3.xv2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5NZXRob2QgOiBXZWlnaHRlZCBBdmVyYWdpbmdcbkNhbGwgICA6IFdBKHkgPSBzcGVjaWVzLmlubGFuZC5sb2csIHggPSBjaGVtLmlubGFuZCRDb25kLCB0b2xEVyA9IFRSVUUpIFxuXG5Ub2xlcmFuY2UgRFcgICAgICAgOiBZZXMgXG5Nb25vdG9uaWMgZGVzaHJpbmsgOiBObyBcbk5vLiBzYW1wbGVzICAgICAgICA6IDM4IFxuTm8uIHNwZWNpZXMgICAgICAgIDogODQgXG5Dcm9zcyB2YWwuICAgICAgICAgOiBib290c3RyYXAgOiBuby4gYm9vdCBjeWNsZXMgPSAgMTAwMCBcblxuRGVzaHJpbmtpbmcgcmVncmVzc2lvbiBjb2VmZmljaWVudHM6XG4gICAgICAgICAgSW52ZXJzZSBkL3MgQ2xhc3NpY2FsIGQvc1xud2EuYjAgICAgICAgICAtMC40MDQ0ICAgICAgICAwLjE5NzZcbndhLmIxICAgICAgICAgIDIuMTQxNyAgICAgICAgMC40NDYwXG53YS50b2wuYjAgICAgIC0wLjAxNjkgICAgICAgIDAuMDIyMVxud2EudG9sLmIxICAgICAgMS4wNjAzICAgICAgICAwLjkyODVcblxuUGVyZm9ybWFuY2U6XG4gICAgICAgICAgICAgICAgICAgUk1TRSAgICAgIFIyICBBdmcuQmlhcyAgTWF4LkJpYXMgICAgU2tpbGxcbldBLmludiAgICAgICAgICAgMC4wNzQ2ICAwLjk1NTMgICAgMC4wMDAwICAgIDAuMjU4OSAgOTUuNTI4OFxuV0EuY2xhICAgICAgICAgICAwLjA3NjQgIDAuOTU1MyAgICAwLjAwMDAgICAgMC4yODYzICA5NS4zMTk1XG5XQS5pbnYudG9sICAgICAgIDAuMDQ0MCAgMC45ODQ0ICAgIDAuMDAwMCAgICAwLjE1MzcgIDk4LjQ0NDZcbldBLmNsYS50b2wgICAgICAgMC4wNDQ0ICAwLjk4NDQgICAgMC4wMDAwICAgIDAuMTYxMyAgOTguNDIwMFxuV0EuaW52X1hWYWwgICAgICAwLjA4NzUgIDAuOTQ0MyAgIC0wLjAwNDQgICAgMC4yOTAxICA5NC40MDg2XG5XQS5jbGFfWFZhbCAgICAgIDAuMDg3MiAgMC45NDU2ICAgLTAuMDA0NSAgICAwLjMwODEgIDk0LjQxOTdcbldBLmludi50b2xfWFZhbCAgMC4wNjA2ICAwLjk3NTcgICAgMC4wMDA4ICAgIDAuMjAyMyAgOTcuNTY0MVxuV0EuY2xhLnRvbF9YVmFsICAwLjA2MDUgIDAuOTc2MCAgICAwLjAwMDcgICAgMC4yMDc1ICA5Ny41NjUyXG4ifQ== -->
+<pre><code>
+Method : Weighted Averaging
+Call   : WA(y = species.inland.log, x = chem.inland$Cond, tolDW = TRUE) 
+
+Tolerance DW       : Yes 
+Monotonic deshrink : No 
+No. samples        : 38 
+No. species        : 84 
+Cross val.         : bootstrap : no. boot cycles =  1000 
+
+Deshrinking regression coefficients:
+          Inverse d/s Classical d/s
+wa.b0         -0.4044        0.1976
+wa.b1          2.1417        0.4460
+wa.tol.b0     -0.0169        0.0221
+wa.tol.b1      1.0603        0.9285
+
+Performance:
+                   RMSE      R2  Avg.Bias  Max.Bias    Skill
+WA.inv           0.0746  0.9553    0.0000    0.2589  95.5288
+WA.cla           0.0764  0.9553    0.0000    0.2863  95.3195
+WA.inv.tol       0.0440  0.9844    0.0000    0.1537  98.4446
+WA.cla.tol       0.0444  0.9844    0.0000    0.1613  98.4200
+WA.inv_XVal      0.0875  0.9443   -0.0044    0.2901  94.4086
+WA.cla_XVal      0.0872  0.9456   -0.0045    0.3081  94.4197
+WA.inv.tol_XVal  0.0606  0.9757    0.0008    0.2023  97.5641
+WA.cla.tol_XVal  0.0605  0.9760    0.0007    0.2075  97.5652</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="weighted-averaging---partial-lineal-square" class="section level1">
+<h1><strong>Weighted Averaging - Partial Lineal Square</strong></h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kNCA8LSBXQVBMUyhcbiAgc3BlY2llcy5pbmxhbmQuaGVsLCAjI0hlbGxpbmdlciB0cmFuZm9ybWVkIyNcbiAgY2hlbS5pbmxhbmQkQ29uZCxcbiAgKVxuXG5tb2Q1IDwtIFdBUExTKFxuICBzcGVjaWVzLmlubGFuZC5zcXJ0LCAjI1NxdWFyZS1yb290IHRyYW5mb3JtZWQjI1xuICBjaGVtLmlubGFuZCRDb25kLFxuICApXG5cbm1vZDYgPC0gV0FQTFMoXG4gIHNwZWNpZXMuaW5sYW5kLmxvZywgIyNMb2ctdHJhbmZvcm1lZCMjXG4gIGNoZW0uaW5sYW5kJENvbmQsXG4gIClcbmBgYCJ9 -->
+<pre class="r"><code>mod4 &lt;- WAPLS(
+  species.inland.hel, ##Hellinger tranformed##
+  chem.inland$Cond,
+  )
+
+mod5 &lt;- WAPLS(
+  species.inland.sqrt, ##Square-root tranformed##
+  chem.inland$Cond,
+  )
+
+mod6 &lt;- WAPLS(
+  species.inland.log, ##Log-tranformed##
+  chem.inland$Cond,
+  )</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGxlYXZlLW9uZS1vdXQjI1xubW9kNC54djEgPC0gY3Jvc3N2YWwobW9kNCwgY3YubWV0aG9kID0gXCJsb29cIilcbmBgYCJ9 -->
+<pre class="r"><code>##Cross-validation using leave-one-out##
+mod4.xv1 &lt;- crossval(mod4, cv.method = &quot;loo&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kNC54djFcbmBgYCJ9 -->
+<pre class="r"><code>mod4.xv1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5NZXRob2QgOiBXZWlnaHRlZCBBdmVyYWdpbmcgUGFydGlhbCBMZWFzdCBTcXVhcmVzXG5DYWxsICAgOiBXQVBMUyh5ID0gc3BlY2llcy5pbmxhbmQuaGVsLCB4ID0gY2hlbS5pbmxhbmQkQ29uZCkgXG5cbk5vLiBzYW1wbGVzICAgICAgICA6IDM4IFxuTm8uIHNwZWNpZXMgICAgICAgIDogODQgXG5Oby4gY29tcG9uZW50cyAgICAgOiA1IFxuQ3Jvc3MgdmFsLiAgICAgICAgIDogbG9vIFxuXG5cblBlcmZvcm1hbmNlOlxuICAgICAgICAgICAgICAgUk1TRSAgICAgIFIyICBBdmcuQmlhcyAgTWF4LkJpYXMgICAgU2tpbGxcbkNvbXAwMSAgICAgICAwLjA3MjUgIDAuOTU3OCAgICAwLjAwMTAgICAgMC4yNDYxICA5NS43ODE3XG5Db21wMDIgICAgICAgMC4wNjM0ICAwLjk2NzggICAtMC4wMDEzICAgIDAuMjQwNyAgOTYuNzczMFxuQ29tcDAzICAgICAgIDAuMDU3NiAgMC45NzMzICAgLTAuMDAwNCAgICAwLjIzNDAgIDk3LjMzMzVcbkNvbXAwNCAgICAgICAwLjA0ODMgIDAuOTgxMyAgIC0wLjAwMDQgICAgMC4xOTg2ICA5OC4xMjcxXG5Db21wMDUgICAgICAgMC4wNDE0ICAwLjk4NjIgICAtMC4wMDA0ICAgIDAuMTU2OSAgOTguNjIzMFxuQ29tcDAxX1hWYWwgIDAuMDgwNiAgMC45NDc4ICAgLTAuMDAxMCAgICAwLjI3MzggIDk0Ljc4MzdcbkNvbXAwMl9YVmFsICAwLjA3NTQgIDAuOTU0NSAgIC0wLjAwMTkgICAgMC4yNzIyICA5NS40NDI2XG5Db21wMDNfWFZhbCAgMC4wNzIxICAwLjk1ODMgICAtMC4wMDEwICAgIDAuMjc0MSAgOTUuODMyMFxuQ29tcDA0X1hWYWwgIDAuMDcyNiAgMC45NTgwICAgLTAuMDAyMCAgICAwLjI3MDkgIDk1Ljc3NjBcbkNvbXAwNV9YVmFsICAwLjA3MzkgIDAuOTU2NCAgIC0wLjAwMzAgICAgMC4yNjY0ICA5NS42MTM4XG4ifQ== -->
+<pre><code>
+Method : Weighted Averaging Partial Least Squares
+Call   : WAPLS(y = species.inland.hel, x = chem.inland$Cond) 
+
+No. samples        : 38 
+No. species        : 84 
+No. components     : 5 
+Cross val.         : loo 
+
+
+Performance:
+               RMSE      R2  Avg.Bias  Max.Bias    Skill
+Comp01       0.0725  0.9578    0.0010    0.2461  95.7817
+Comp02       0.0634  0.9678   -0.0013    0.2407  96.7730
+Comp03       0.0576  0.9733   -0.0004    0.2340  97.3335
+Comp04       0.0483  0.9813   -0.0004    0.1986  98.1271
+Comp05       0.0414  0.9862   -0.0004    0.1569  98.6230
+Comp01_XVal  0.0806  0.9478   -0.0010    0.2738  94.7837
+Comp02_XVal  0.0754  0.9545   -0.0019    0.2722  95.4426
+Comp03_XVal  0.0721  0.9583   -0.0010    0.2741  95.8320
+Comp04_XVal  0.0726  0.9580   -0.0020    0.2709  95.7760
+Comp05_XVal  0.0739  0.9564   -0.0030    0.2664  95.6138</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGJvb3N0cmFwaW5nIyNcbm1vZDQueHYyIDwtIGNyb3NzdmFsKG1vZDQsIGN2Lm1ldGhvZCA9IFwiYm9vdFwiLCBuYm9vdCA9IDEwMDApXG5gYGAifQ== -->
+<pre class="r"><code>##Cross-validation using boostraping##
+mod4.xv2 &lt;- crossval(mod4, cv.method = &quot;boot&quot;, nboot = 1000)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kNC54djJcbmBgYCJ9 -->
+<pre class="r"><code>mod4.xv2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5NZXRob2QgOiBXZWlnaHRlZCBBdmVyYWdpbmcgUGFydGlhbCBMZWFzdCBTcXVhcmVzXG5DYWxsICAgOiBXQVBMUyh5ID0gc3BlY2llcy5pbmxhbmQuaGVsLCB4ID0gY2hlbS5pbmxhbmQkQ29uZCkgXG5cbk5vLiBzYW1wbGVzICAgICAgICA6IDM4IFxuTm8uIHNwZWNpZXMgICAgICAgIDogODQgXG5Oby4gY29tcG9uZW50cyAgICAgOiA1IFxuQ3Jvc3MgdmFsLiAgICAgICAgIDogYm9vdHN0cmFwIDogbm8uIGJvb3QgY3ljbGVzID0gIDEwMDAgXG5cblxuUGVyZm9ybWFuY2U6XG4gICAgICAgICAgICAgICBSTVNFICAgICAgUjIgIEF2Zy5CaWFzICBNYXguQmlhcyAgICBTa2lsbFxuQ29tcDAxICAgICAgIDAuMDcyNSAgMC45NTc4ICAgIDAuMDAxMCAgICAwLjI0NjEgIDk1Ljc4MTdcbkNvbXAwMiAgICAgICAwLjA2MzQgIDAuOTY3OCAgIC0wLjAwMTMgICAgMC4yNDA3ICA5Ni43NzMwXG5Db21wMDMgICAgICAgMC4wNTc2ICAwLjk3MzMgICAtMC4wMDA0ICAgIDAuMjM0MCAgOTcuMzMzNVxuQ29tcDA0ICAgICAgIDAuMDQ4MyAgMC45ODEzICAgLTAuMDAwNCAgICAwLjE5ODYgIDk4LjEyNzFcbkNvbXAwNSAgICAgICAwLjA0MTQgIDAuOTg2MiAgIC0wLjAwMDQgICAgMC4xNTY5ICA5OC42MjMwXG5Db21wMDFfWFZhbCAgMC4wODMzICAwLjk0OTAgICAtMC4wMDMzICAgIDAuMjcyOSAgOTQuODkyN1xuQ29tcDAyX1hWYWwgIDAuMDc4NCAgMC45NTU1ICAgLTAuMDAyMCAgICAwLjI3MjggIDk1LjU0MjlcbkNvbXAwM19YVmFsICAwLjA3NzAgIDAuOTU5MiAgIC0wLjAwMjAgICAgMC4yNzQyICA5NS45MTQ2XG5Db21wMDRfWFZhbCAgMC4wODE3ICAwLjk1ODUgICAtMC4wMDQwICAgIDAuMjcxOSAgOTUuODI3MVxuQ29tcDA1X1hWYWwgIDAuMDg2OCAgMC45NTY4ICAgLTAuMDA0MyAgICAwLjI2ODQgIDk1LjY1OTFcbiJ9 -->
+<pre><code>
+Method : Weighted Averaging Partial Least Squares
+Call   : WAPLS(y = species.inland.hel, x = chem.inland$Cond) 
+
+No. samples        : 38 
+No. species        : 84 
+No. components     : 5 
+Cross val.         : bootstrap : no. boot cycles =  1000 
+
+
+Performance:
+               RMSE      R2  Avg.Bias  Max.Bias    Skill
+Comp01       0.0725  0.9578    0.0010    0.2461  95.7817
+Comp02       0.0634  0.9678   -0.0013    0.2407  96.7730
+Comp03       0.0576  0.9733   -0.0004    0.2340  97.3335
+Comp04       0.0483  0.9813   -0.0004    0.1986  98.1271
+Comp05       0.0414  0.9862   -0.0004    0.1569  98.6230
+Comp01_XVal  0.0833  0.9490   -0.0033    0.2729  94.8927
+Comp02_XVal  0.0784  0.9555   -0.0020    0.2728  95.5429
+Comp03_XVal  0.0770  0.9592   -0.0020    0.2742  95.9146
+Comp04_XVal  0.0817  0.9585   -0.0040    0.2719  95.8271
+Comp05_XVal  0.0868  0.9568   -0.0043    0.2684  95.6591</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGxlYXZlLW9uZS1vdXQjI1xubW9kNS54djEgPC0gY3Jvc3N2YWwobW9kNSwgY3YubWV0aG9kID0gXCJsb29cIilcbmBgYCJ9 -->
+<pre class="r"><code>##Cross-validation using leave-one-out##
+mod5.xv1 &lt;- crossval(mod5, cv.method = &quot;loo&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kNS54djFcbmBgYCJ9 -->
+<pre class="r"><code>mod5.xv1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5NZXRob2QgOiBXZWlnaHRlZCBBdmVyYWdpbmcgUGFydGlhbCBMZWFzdCBTcXVhcmVzXG5DYWxsICAgOiBXQVBMUyh5ID0gc3BlY2llcy5pbmxhbmQuc3FydCwgeCA9IGNoZW0uaW5sYW5kJENvbmQpIFxuXG5Oby4gc2FtcGxlcyAgICAgICAgOiAzOCBcbk5vLiBzcGVjaWVzICAgICAgICA6IDg0IFxuTm8uIGNvbXBvbmVudHMgICAgIDogNSBcbkNyb3NzIHZhbC4gICAgICAgICA6IGxvbyBcblxuXG5QZXJmb3JtYW5jZTpcbiAgICAgICAgICAgICAgIFJNU0UgICAgICBSMiAgQXZnLkJpYXMgIE1heC5CaWFzICAgIFNraWxsXG5Db21wMDEgICAgICAgMC4wNzI2ICAwLjk1NzggICAgMC4wMDA5ICAgIDAuMjQ2NCAgOTUuNzc0NVxuQ29tcDAyICAgICAgIDAuMDYzMyAgMC45Njc4ICAgLTAuMDAxMyAgICAwLjI0MDkgIDk2Ljc4MTVcbkNvbXAwMyAgICAgICAwLjA1NzYgIDAuOTczNCAgIC0wLjAwMDQgICAgMC4yMzQxICA5Ny4zMzkyXG5Db21wMDQgICAgICAgMC4wNDgyICAwLjk4MTQgICAtMC4wMDA1ICAgIDAuMTk4MSAgOTguMTM3NlxuQ29tcDA1ICAgICAgIDAuMDQxMyAgMC45ODYzICAgLTAuMDAwNSAgICAwLjE1NjIgIDk4LjYyOTVcbkNvbXAwMV9YVmFsICAwLjA4MDcgIDAuOTQ3NyAgIC0wLjAwMTEgICAgMC4yNzQxICA5NC43NzA0XG5Db21wMDJfWFZhbCAgMC4wNzU0ICAwLjk1NDQgICAtMC4wMDIwICAgIDAuMjcyNiAgOTUuNDM3M1xuQ29tcDAzX1hWYWwgIDAuMDcyMSAgMC45NTgzICAgLTAuMDAxMCAgICAwLjI3NDQgIDk1LjgzMTBcbkNvbXAwNF9YVmFsICAwLjA3MjYgIDAuOTU4MCAgIC0wLjAwMjEgICAgMC4yNzA5ICA5NS43NzU3XG5Db21wMDVfWFZhbCAgMC4wNzQwICAwLjk1NjQgICAtMC4wMDMwICAgIDAuMjY2MSAgOTUuNjExMFxuIn0= -->
+<pre><code>
+Method : Weighted Averaging Partial Least Squares
+Call   : WAPLS(y = species.inland.sqrt, x = chem.inland$Cond) 
+
+No. samples        : 38 
+No. species        : 84 
+No. components     : 5 
+Cross val.         : loo 
+
+
+Performance:
+               RMSE      R2  Avg.Bias  Max.Bias    Skill
+Comp01       0.0726  0.9578    0.0009    0.2464  95.7745
+Comp02       0.0633  0.9678   -0.0013    0.2409  96.7815
+Comp03       0.0576  0.9734   -0.0004    0.2341  97.3392
+Comp04       0.0482  0.9814   -0.0005    0.1981  98.1376
+Comp05       0.0413  0.9863   -0.0005    0.1562  98.6295
+Comp01_XVal  0.0807  0.9477   -0.0011    0.2741  94.7704
+Comp02_XVal  0.0754  0.9544   -0.0020    0.2726  95.4373
+Comp03_XVal  0.0721  0.9583   -0.0010    0.2744  95.8310
+Comp04_XVal  0.0726  0.9580   -0.0021    0.2709  95.7757
+Comp05_XVal  0.0740  0.9564   -0.0030    0.2661  95.6110</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGJvb3N0cmFwaW5nIyNcbm1vZDUueHYyIDwtIGNyb3NzdmFsKG1vZDUsIGN2Lm1ldGhvZCA9IFwiYm9vdFwiLCBuYm9vdCA9IDEwMDApXG5gYGAifQ== -->
+<pre class="r"><code>##Cross-validation using boostraping##
+mod5.xv2 &lt;- crossval(mod5, cv.method = &quot;boot&quot;, nboot = 1000)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kNS54djJcbmBgYCJ9 -->
+<pre class="r"><code>mod5.xv2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5NZXRob2QgOiBXZWlnaHRlZCBBdmVyYWdpbmcgUGFydGlhbCBMZWFzdCBTcXVhcmVzXG5DYWxsICAgOiBXQVBMUyh5ID0gc3BlY2llcy5pbmxhbmQuc3FydCwgeCA9IGNoZW0uaW5sYW5kJENvbmQpIFxuXG5Oby4gc2FtcGxlcyAgICAgICAgOiAzOCBcbk5vLiBzcGVjaWVzICAgICAgICA6IDg0IFxuTm8uIGNvbXBvbmVudHMgICAgIDogNSBcbkNyb3NzIHZhbC4gICAgICAgICA6IGJvb3RzdHJhcCA6IG5vLiBib290IGN5Y2xlcyA9ICAxMDAwIFxuXG5cblBlcmZvcm1hbmNlOlxuICAgICAgICAgICAgICAgUk1TRSAgICAgIFIyICBBdmcuQmlhcyAgTWF4LkJpYXMgICAgU2tpbGxcbkNvbXAwMSAgICAgICAwLjA3MjYgIDAuOTU3OCAgICAwLjAwMDkgICAgMC4yNDY0ICA5NS43NzQ1XG5Db21wMDIgICAgICAgMC4wNjMzICAwLjk2NzggICAtMC4wMDEzICAgIDAuMjQwOSAgOTYuNzgxNVxuQ29tcDAzICAgICAgIDAuMDU3NiAgMC45NzM0ICAgLTAuMDAwNCAgICAwLjIzNDEgIDk3LjMzOTJcbkNvbXAwNCAgICAgICAwLjA0ODIgIDAuOTgxNCAgIC0wLjAwMDUgICAgMC4xOTgxICA5OC4xMzc2XG5Db21wMDUgICAgICAgMC4wNDEzICAwLjk4NjMgICAtMC4wMDA1ICAgIDAuMTU2MiAgOTguNjI5NVxuQ29tcDAxX1hWYWwgIDAuMDgzOSAgMC45NDg2ICAgLTAuMDAyOSAgICAwLjI3MTUgIDk0Ljg0MzBcbkNvbXAwMl9YVmFsICAwLjA3OTAgIDAuOTU1MCAgIC0wLjAwMTAgICAgMC4yNzIyICA5NS40OTQwXG5Db21wMDNfWFZhbCAgMC4wNzY5ICAwLjk1ODkgICAtMC4wMDEzICAgIDAuMjc0MSAgOTUuODg1NFxuQ29tcDA0X1hWYWwgIDAuMDgxNCAgMC45NTgwICAgLTAuMDAzMyAgICAwLjI3MzQgIDk1Ljc4MjNcbkNvbXAwNV9YVmFsICAwLjA4NTYgIDAuOTU2NyAgIC0wLjAwMzkgICAgMC4yNzA4ICA5NS42NDEzXG4ifQ== -->
+<pre><code>
+Method : Weighted Averaging Partial Least Squares
+Call   : WAPLS(y = species.inland.sqrt, x = chem.inland$Cond) 
+
+No. samples        : 38 
+No. species        : 84 
+No. components     : 5 
+Cross val.         : bootstrap : no. boot cycles =  1000 
+
+
+Performance:
+               RMSE      R2  Avg.Bias  Max.Bias    Skill
+Comp01       0.0726  0.9578    0.0009    0.2464  95.7745
+Comp02       0.0633  0.9678   -0.0013    0.2409  96.7815
+Comp03       0.0576  0.9734   -0.0004    0.2341  97.3392
+Comp04       0.0482  0.9814   -0.0005    0.1981  98.1376
+Comp05       0.0413  0.9863   -0.0005    0.1562  98.6295
+Comp01_XVal  0.0839  0.9486   -0.0029    0.2715  94.8430
+Comp02_XVal  0.0790  0.9550   -0.0010    0.2722  95.4940
+Comp03_XVal  0.0769  0.9589   -0.0013    0.2741  95.8854
+Comp04_XVal  0.0814  0.9580   -0.0033    0.2734  95.7823
+Comp05_XVal  0.0856  0.9567   -0.0039    0.2708  95.6413</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGxlYXZlLW9uZS1vdXQjI1xubW9kNi54djEgPC0gY3Jvc3N2YWwobW9kNiwgY3YubWV0aG9kID0gXCJsb29cIilcbmBgYCJ9 -->
+<pre class="r"><code>##Cross-validation using leave-one-out##
+mod6.xv1 &lt;- crossval(mod6, cv.method = &quot;loo&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kNi54djFcbmBgYCJ9 -->
+<pre class="r"><code>mod6.xv1</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5NZXRob2QgOiBXZWlnaHRlZCBBdmVyYWdpbmcgUGFydGlhbCBMZWFzdCBTcXVhcmVzXG5DYWxsICAgOiBXQVBMUyh5ID0gc3BlY2llcy5pbmxhbmQubG9nLCB4ID0gY2hlbS5pbmxhbmQkQ29uZCkgXG5cbk5vLiBzYW1wbGVzICAgICAgICA6IDM4IFxuTm8uIHNwZWNpZXMgICAgICAgIDogODQgXG5Oby4gY29tcG9uZW50cyAgICAgOiA1IFxuQ3Jvc3MgdmFsLiAgICAgICAgIDogbG9vIFxuXG5cblBlcmZvcm1hbmNlOlxuICAgICAgICAgICAgICAgUk1TRSAgICAgIFIyICBBdmcuQmlhcyAgTWF4LkJpYXMgICAgU2tpbGxcbkNvbXAwMSAgICAgICAwLjA3NDcgIDAuOTU1MyAgICAwLjAwMDcgICAgMC4yNTkyICA5NS41MjgxXG5Db21wMDIgICAgICAgMC4wNjU1ICAwLjk2NTYgICAtMC4wMDE3ICAgIDAuMjUxMiAgOTYuNTU0NlxuQ29tcDAzICAgICAgIDAuMDYwMCAgMC45NzExICAgLTAuMDAwNiAgICAwLjI0MTggIDk3LjExMDBcbkNvbXAwNCAgICAgICAwLjA0OTMgIDAuOTgwNiAgIC0wLjAwMDcgICAgMC4xOTI1ICA5OC4wNTM1XG5Db21wMDUgICAgICAgMC4wNDA4ICAwLjk4NjcgICAtMC4wMDA5ICAgIDAuMTM5MyAgOTguNjYzNlxuQ29tcDAxX1hWYWwgIDAuMDgzNyAgMC45NDM4ICAgLTAuMDAxMyAgICAwLjI4OTUgIDk0LjM3ODlcbkNvbXAwMl9YVmFsICAwLjA3OTAgIDAuOTQ5OSAgIC0wLjAwMTkgICAgMC4yODcwICA5NC45ODg5XG5Db21wMDNfWFZhbCAgMC4wNzYzICAwLjk1MzQgICAtMC4wMDA1ICAgIDAuMjg4MSAgOTUuMzMwM1xuQ29tcDA0X1hWYWwgIDAuMDc4MiAgMC45NTE0ICAgLTAuMDAxMyAgICAwLjI4MTIgIDk1LjA5NjRcbkNvbXAwNV9YVmFsICAwLjA4MTIgIDAuOTQ3OSAgIC0wLjAwMTggICAgMC4yNzE2ICA5NC43MTUyXG4ifQ== -->
+<pre><code>
+Method : Weighted Averaging Partial Least Squares
+Call   : WAPLS(y = species.inland.log, x = chem.inland$Cond) 
+
+No. samples        : 38 
+No. species        : 84 
+No. components     : 5 
+Cross val.         : loo 
+
+
+Performance:
+               RMSE      R2  Avg.Bias  Max.Bias    Skill
+Comp01       0.0747  0.9553    0.0007    0.2592  95.5281
+Comp02       0.0655  0.9656   -0.0017    0.2512  96.5546
+Comp03       0.0600  0.9711   -0.0006    0.2418  97.1100
+Comp04       0.0493  0.9806   -0.0007    0.1925  98.0535
+Comp05       0.0408  0.9867   -0.0009    0.1393  98.6636
+Comp01_XVal  0.0837  0.9438   -0.0013    0.2895  94.3789
+Comp02_XVal  0.0790  0.9499   -0.0019    0.2870  94.9889
+Comp03_XVal  0.0763  0.9534   -0.0005    0.2881  95.3303
+Comp04_XVal  0.0782  0.9514   -0.0013    0.2812  95.0964
+Comp05_XVal  0.0812  0.9479   -0.0018    0.2716  94.7152</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGJvb3N0cmFwaW5nIyNcbm1vZDYueHYyIDwtIGNyb3NzdmFsKG1vZDYsIGN2Lm1ldGhvZCA9IFwiYm9vdFwiLCBuYm9vdCA9IDEwMDApXG5gYGAifQ== -->
+<pre class="r"><code>##Cross-validation using boostraping##
+mod6.xv2 &lt;- crossval(mod6, cv.method = &quot;boot&quot;, nboot = 1000)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kNi54djJcbmBgYCJ9 -->
+<pre class="r"><code>mod6.xv2</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5NZXRob2QgOiBXZWlnaHRlZCBBdmVyYWdpbmcgUGFydGlhbCBMZWFzdCBTcXVhcmVzXG5DYWxsICAgOiBXQVBMUyh5ID0gc3BlY2llcy5pbmxhbmQubG9nLCB4ID0gY2hlbS5pbmxhbmQkQ29uZCkgXG5cbk5vLiBzYW1wbGVzICAgICAgICA6IDM4IFxuTm8uIHNwZWNpZXMgICAgICAgIDogODQgXG5Oby4gY29tcG9uZW50cyAgICAgOiA1IFxuQ3Jvc3MgdmFsLiAgICAgICAgIDogYm9vdHN0cmFwIDogbm8uIGJvb3QgY3ljbGVzID0gIDEwMDAgXG5cblxuUGVyZm9ybWFuY2U6XG4gICAgICAgICAgICAgICBSTVNFICAgICAgUjIgIEF2Zy5CaWFzICBNYXguQmlhcyAgICBTa2lsbFxuQ29tcDAxICAgICAgIDAuMDc0NyAgMC45NTUzICAgIDAuMDAwNyAgICAwLjI1OTIgIDk1LjUyODFcbkNvbXAwMiAgICAgICAwLjA2NTUgIDAuOTY1NiAgIC0wLjAwMTcgICAgMC4yNTEyICA5Ni41NTQ2XG5Db21wMDMgICAgICAgMC4wNjAwICAwLjk3MTEgICAtMC4wMDA2ICAgIDAuMjQxOCAgOTcuMTEwMFxuQ29tcDA0ICAgICAgIDAuMDQ5MyAgMC45ODA2ICAgLTAuMDAwNyAgICAwLjE5MjUgIDk4LjA1MzVcbkNvbXAwNSAgICAgICAwLjA0MDggIDAuOTg2NyAgIC0wLjAwMDkgICAgMC4xMzkzICA5OC42NjM2XG5Db21wMDFfWFZhbCAgMC4wODc3ICAwLjk0NDQgICAtMC4wMDM3ICAgIDAuMjg4MyAgOTQuNDIyMFxuQ29tcDAyX1hWYWwgIDAuMDgyNCAgMC45NTEyICAgLTAuMDAxNSAgICAwLjI4ODYgIDk1LjExMzRcbkNvbXAwM19YVmFsICAwLjA4MjUgIDAuOTUzOSAgIC0wLjAwMTggICAgMC4yODk2ICA5NS4zNzg1XG5Db21wMDRfWFZhbCAgMC4wODg3ICAwLjk1MjIgICAtMC4wMDM1ICAgIDAuMjg0NSAgOTUuMTg5OVxuQ29tcDA1X1hWYWwgIDAuMDk0MSAgMC45NTAxICAgLTAuMDAzMiAgICAwLjI3NjQgIDk0Ljk3NTZcbiJ9 -->
+<pre><code>
+Method : Weighted Averaging Partial Least Squares
+Call   : WAPLS(y = species.inland.log, x = chem.inland$Cond) 
+
+No. samples        : 38 
+No. species        : 84 
+No. components     : 5 
+Cross val.         : bootstrap : no. boot cycles =  1000 
+
+
+Performance:
+               RMSE      R2  Avg.Bias  Max.Bias    Skill
+Comp01       0.0747  0.9553    0.0007    0.2592  95.5281
+Comp02       0.0655  0.9656   -0.0017    0.2512  96.5546
+Comp03       0.0600  0.9711   -0.0006    0.2418  97.1100
+Comp04       0.0493  0.9806   -0.0007    0.1925  98.0535
+Comp05       0.0408  0.9867   -0.0009    0.1393  98.6636
+Comp01_XVal  0.0877  0.9444   -0.0037    0.2883  94.4220
+Comp02_XVal  0.0824  0.9512   -0.0015    0.2886  95.1134
+Comp03_XVal  0.0825  0.9539   -0.0018    0.2896  95.3785
+Comp04_XVal  0.0887  0.9522   -0.0035    0.2845  95.1899
+Comp05_XVal  0.0941  0.9501   -0.0032    0.2764  94.9756</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRpYXRvbS1iYXNlZCBDYWxpYnJhdGlvbiBNb2RlbCINCmF1dGhvcjogIlbDqWxlei1BZ3VkZWxvIENhbWlsbyINCmRhdGU6ICI4LzMvMjAyMiINCm91dHB1dDoNCiAgaHRtbF9ub3RlYm9vazoNCiAgICBjb2RlX2ZvbGRpbmc6ICJzaG93Ig0KICAgIHRvYzogeWVzDQogICAgdG9jX2Zsb2F0OiB5ZXMNCi0tLQ0KDQpgYGB7ciBzZXR1cCwgaW5jbHVkZT1GQUxTRX0NCmtuaXRyOjpvcHRzX2NodW5rJHNldChldmFsID0gVFJVRSwgZWNobyA9IFRSVUUsIG1lc3NhZ2UgPSBGQUxTRSwgd2FybmluZyA9IEZBTFNFKQ0KDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkodmVnYW4pDQpsaWJyYXJ5KHJpb2phKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShnZ3B1YnIpDQpsaWJyYXJ5KGthYmxlRXh0cmEpDQpsaWJyYXJ5KGdyaWRFeHRyYSkNCmxpYnJhcnkocnN0YXRpeCkNCmBgYA0KDQojICoqUHJlcHJvY2Vzc2luZyBEYXRhKiogIw0KYGBge3IgTG9hZGluZy5kYXRhfQ0KDQpzcGVjaWVzUkMgPC0gcmVhZFJEUygic3BlY2llc1JDLnJkcyIpICMjQ29sb3JhZG8gUml2ZXIgRGlhdG9tIERhdGEjIw0Kc3BlY2llc1JOIDwtIHJlYWRSRFMoInNwZWNpZXNSTi5yZHMiKSAjI05lZ3JvIFJpdmVyIERpYXRvbSBEYXRhIyMNCnNwZWNpZXNDSCA8LSByZWFkUkRTKCJzcGVjaWVzQ0gucmRzIikgIyNDaHVidXQgUml2ZXIgRGlhdG9tIERhdGEjIw0KDQpuYW1lcyA8LSByZWFkUkRTKCJuYW1lcy5jb2RlLnJkcyIpICAgIyNTcGVjaWVzIG5hbWUgY29kZSMjIA0KDQpjaGVtIDwtIHJlYWRSRFMoImNoZW0ucmRzIikgICAgICAgICAgIyNIaWRyb2NoZW1pY2FsIHZhcmlhYmxlcyMjDQpgYGANCg0KYGBge3IgQ29tYmluaW5nLmRhdGF9DQpjb2xuYW1lcyhzcGVjaWVzUkMpIDwtIG5hbWVzW1sxXV1bLCAyXQ0KY29sbmFtZXMoc3BlY2llc1JOKSA8LSBuYW1lc1tbMl1dWywgMl0NCmNvbG5hbWVzKHNwZWNpZXNDSCkgPC0gbmFtZXNbWzNdXVssIDJdDQoNCnNwZWNpZXMuY29tcGxldGUgPC0gTWVyZ2UoDQogIHNwZWNpZXNSQywNCiAgc3BlY2llc1JOLA0KICBzcGVjaWVzQ0gNCikNCg0KIyNGaWx0ZXIgZGF0YSBieSBpbmxhbmQgc3BlY2llcyMjDQpzcGVjaWVzLmlubGFuZCA8LSBzcGVjaWVzLmNvbXBsZXRlWy1jKDE6MywgMTY6MTgsIDM0OjM4KSxdDQpzcGVjaWVzLmlubGFuZCA8LSBzcGVjaWVzLmlubGFuZFssIGNvbFN1bXMoc3BlY2llcy5pbmxhbmQpID4gMF0NCg0KIyNIeWRvY2hlbWljYWwgdmFyaWFibGVzIGluIGlubGFuZCBzaXRlcyMjDQpjaGVtLmlubGFuZCA8LSBjaGVtWy1jKDE6MywgMTY6MTgsIDM0OjM4KSxdDQpgYGANCg0KDQoNCg0KDQoNCg0K</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRpYXRvbS1iYXNlZCBDYWxpYnJhdGlvbiBNb2RlbCINCmF1dGhvcjogIlbDqWxlei1BZ3VkZWxvIENhbWlsbyINCmRhdGU6ICI4LzMvMjAyMiINCm91dHB1dDoNCiAgaHRtbF9ub3RlYm9vazoNCiAgICBjb2RlX2ZvbGRpbmc6ICJzaG93Ig0KICAgIHRvYzogeWVzDQogICAgdG9jX2Zsb2F0OiB5ZXMNCi0tLQ0KDQpgYGB7ciBzZXR1cCwgaW5jbHVkZT1GQUxTRX0NCmtuaXRyOjpvcHRzX2NodW5rJHNldChldmFsID0gVFJVRSwgZWNobyA9IFRSVUUsIG1lc3NhZ2UgPSBGQUxTRSwgd2FybmluZyA9IEZBTFNFKQ0KDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkodmVnYW4pDQpsaWJyYXJ5KHJpb2phKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShnZ3B1YnIpDQpsaWJyYXJ5KGthYmxlRXh0cmEpDQpsaWJyYXJ5KGdyaWRFeHRyYSkNCmxpYnJhcnkocnN0YXRpeCkNCmBgYA0KDQpBIHNlcmllcyBvZiBXQSBhbmQgV0EtUExTIG1vZGVscyB3ZXJlIGRldmVsb3BlZCB1c2luZyB0aGUgc2NyZWVuZWQgZGF0YSBzZXQgKDM4IHNhbXBsaW5nIHNpdGVzIGFuZCA0NSBkaWF0b20gdGF4YSkgdG8gaWRlbnRpZnkgdGhlIGJlc3QgY2FsaWJyYXRpb24gbW9kZWwgdGhhdCBhbGxvd3MgcmVsaWFibGUgY29uZHVjdGl2aXR5IHJlY29uc3RydWN0aW9ucyBpbiBub3J0aGVybiBQYXRhZ29uaWEuDQoNCiMgKipQcmVwcm9jZXNzaW5nIERhdGEqKiAjDQpgYGB7ciBMb2FkaW5nLmRhdGF9DQoNCnNwZWNpZXNSQyA8LSByZWFkUkRTKCJzcGVjaWVzUkMucmRzIikgIyNDb2xvcmFkbyBSaXZlciBEaWF0b20gRGF0YSMjDQpzcGVjaWVzUk4gPC0gcmVhZFJEUygic3BlY2llc1JOLnJkcyIpICMjTmVncm8gUml2ZXIgRGlhdG9tIERhdGEjIw0Kc3BlY2llc0NIIDwtIHJlYWRSRFMoInNwZWNpZXNDSC5yZHMiKSAjI0NodWJ1dCBSaXZlciBEaWF0b20gRGF0YSMjDQoNCm5hbWVzIDwtIHJlYWRSRFMoIm5hbWVzLmNvZGUucmRzIikgICAjI1NwZWNpZXMgbmFtZSBjb2RlIyMgDQoNCnZhcmFtIDwtIHJlYWRSRFMoInZhcmFtLnJkcyIpDQpjaGVtIDwtIHJlYWRSRFMoImNoZW0ucmRzIikgICAgICAgICAgIyNIaWRyb2NoZW1pY2FsIHZhcmlhYmxlcyBMb2ctVHJhbnNmb3JtZWQjIw0KYGBgDQoNCmBgYHtyIENvbWJpbmluZy5kYXRhfQ0KY29sbmFtZXMoc3BlY2llc1JDKSA8LSBuYW1lc1tbMV1dWywgMl0NCmNvbG5hbWVzKHNwZWNpZXNSTikgPC0gbmFtZXNbWzJdXVssIDJdDQpjb2xuYW1lcyhzcGVjaWVzQ0gpIDwtIG5hbWVzW1szXV1bLCAyXQ0KDQpzcGVjaWVzLmNvbXBsZXRlIDwtIE1lcmdlKA0KICBzcGVjaWVzUkMsDQogIHNwZWNpZXNSTiwNCiAgc3BlY2llc0NIDQopDQoNCiMjRmlsdGVyIGRhdGEgYnkgaW5sYW5kIHNwZWNpZXMjIw0Kc3BlY2llcy5pbmxhbmQgPC0gc3BlY2llcy5jb21wbGV0ZVstYygxOjMsIDE2OjE4LCAzNDozOCksXQ0Kc3BlY2llcy5pbmxhbmQgPC0gc3BlY2llcy5pbmxhbmRbLCBjb2xTdW1zKHNwZWNpZXMuaW5sYW5kKSA+IDBdDQoNCiMjSHlkb2NoZW1pY2FsIHZhcmlhYmxlcyBpbiBpbmxhbmQgc2l0ZXMjIw0KY2hlbS5pbmxhbmQgPC0gY2hlbVstYygxOjMsIDE2OjE4LCAzNDozOCksXQ0KYGBgDQoNCmBgYHtyIERpYXRvbS5kYXRhLnRyYW5zZm9ybWF0aW9ufQ0KDQpzcGVjaWVzLmlubGFuZC5oZWwgPC0gZGVjb3N0YW5kKHNwZWNpZXMuaW5sYW5kLCAiaGVsbGluZ2VyIikNCnNwZWNpZXMuaW5sYW5kLnNxcnQgPC0gc3FydChzcGVjaWVzLmlubGFuZCkNCnNwZWNpZXMuaW5sYW5kLmxvZyA8LSBsb2cxcChzcGVjaWVzLmlubGFuZCkNCmBgYA0KDQojICoqV2VpZ2h0ZWQgQXZlcmFnaW5nKiogIw0KYGBge3IgV0F9DQptb2QxIDwtIFdBKA0KICBzcGVjaWVzLmlubGFuZC5oZWwsICMjSGVsbGluZ2VyIHRyYW5mb3JtZWQjIw0KICBjaGVtLmlubGFuZCRDb25kLA0KICB0b2xEVz1UUlVFDQogICkNCg0KbW9kMiA8LSBXQSgNCiAgc3BlY2llcy5pbmxhbmQuc3FydCwgIyNTcXVhcmUtcm9vdCB0cmFuZm9ybWVkIyMNCiAgY2hlbS5pbmxhbmQkQ29uZCwNCiAgdG9sRFc9VFJVRQ0KICApDQoNCm1vZDMgPC0gV0EoDQogIHNwZWNpZXMuaW5sYW5kLmxvZywgIyNMb2ctdHJhbmZvcm1lZCMjDQogIGNoZW0uaW5sYW5kJENvbmQsDQogIHRvbERXPVRSVUUNCiAgKQ0KYGBgDQoNCmBgYHtyIFdBLmNyb3NzLmhlbGwxLCBlY2hvID0gVFJVRSwgcmVzdWx0cyA9IEZBTFNFfQ0KIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGxlYXZlLW9uZS1vdXQjIw0KbW9kMS54djEgPC0gY3Jvc3N2YWwobW9kMSwgY3YubWV0aG9kID0gImxvbyIpDQpgYGANCg0KYGBge3J9DQptb2QxLnh2MQ0KYGBgDQoNCmBgYHtyIFdBLmNyb3NzLmhlbGwyLCBlY2hvID0gVFJVRSwgcmVzdWx0cyA9IEZBTFNFfQ0KIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGJvb3RzdHJhcGluZyMjDQptb2QxLnh2MiA8LSBjcm9zc3ZhbChtb2QxLCBjdi5tZXRob2QgPSAiYm9vdCIsIG5ib290ID0gMTAwMCkNCmBgYA0KDQpgYGB7cn0NCm1vZDEueHYyDQpgYGANCg0KYGBge3IgV0EuY3Jvc3Muc3F1YXJlMSwgZWNobyA9IFRSVUUsIHJlc3VsdHMgPSBGQUxTRX0NCiMjQ3Jvc3MtdmFsaWRhdGlvbiB1c2luZyBsZWF2ZS1vbmUtb3V0IyMNCm1vZDIueHYxIDwtIGNyb3NzdmFsKG1vZDIsIGN2Lm1ldGhvZCA9ICJsb28iKQ0KYGBgDQoNCmBgYHtyfQ0KbW9kMi54djENCmBgYA0KDQpgYGB7ciBXQS5jcm9zcy5zcXVhcmUyLCBlY2hvID0gVFJVRSwgcmVzdWx0cyA9IEZBTFNFfQ0KIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGJvb3RzdHJhcGluZyMjDQptb2QyLnh2MiA8LSBjcm9zc3ZhbChtb2QyLCBjdi5tZXRob2QgPSAiYm9vdCIsIG5ib290ID0gMTAwMCkgDQpgYGANCg0KYGBge3J9DQptb2QyLnh2Mg0KYGBgDQoNCmBgYHtyIFdBLmNyb3NzLmxvZzEsIGVjaG8gPSBUUlVFLCByZXN1bHRzID0gRkFMU0V9DQojI0Nyb3NzLXZhbGlkYXRpb24gdXNpbmcgbGVhdmUtb25lLW91dCMjDQptb2QzLnh2MSA8LSBjcm9zc3ZhbChtb2QzLCBjdi5tZXRob2QgPSAibG9vIikNCmBgYA0KDQpgYGB7cn0NCm1vZDMueHYxDQpgYGANCg0KYGBge3IgV0EuY3Jvc3MubG9nMiwgZWNobyA9IFRSVUUsIHJlc3VsdHMgPSBGQUxTRX0NCiMjQ3Jvc3MtdmFsaWRhdGlvbiB1c2luZyBCb29zdHJhcGluZyMjDQptb2QzLnh2MiA8LSBjcm9zc3ZhbChtb2QzLCBjdi5tZXRob2QgPSAiYm9vdCIsIG5ib290ID0gMTAwMCkNCmBgYA0KDQpgYGB7cn0NCm1vZDMueHYyDQpgYGANCg0KIyAqKldlaWdodGVkIEF2ZXJhZ2luZyAtIFBhcnRpYWwgTGluZWFsIFNxdWFyZSoqICMNCmBgYHtyIFdBUExTfQ0KbW9kNCA8LSBXQVBMUygNCiAgc3BlY2llcy5pbmxhbmQuaGVsLCAjI0hlbGxpbmdlciB0cmFuZm9ybWVkIyMNCiAgY2hlbS5pbmxhbmQkQ29uZCwNCiAgKQ0KDQptb2Q1IDwtIFdBUExTKA0KICBzcGVjaWVzLmlubGFuZC5zcXJ0LCAjI1NxdWFyZS1yb290IHRyYW5mb3JtZWQjIw0KICBjaGVtLmlubGFuZCRDb25kLA0KICApDQoNCm1vZDYgPC0gV0FQTFMoDQogIHNwZWNpZXMuaW5sYW5kLmxvZywgIyNMb2ctdHJhbmZvcm1lZCMjDQogIGNoZW0uaW5sYW5kJENvbmQsDQogICkNCmBgYA0KDQpgYGB7ciBXQVBMUy5oZWwxLCBlY2hvID0gVFJVRSwgcmVzdWx0cyA9IEZBTFNFfQ0KIyNDcm9zcy12YWxpZGF0aW9uIHVzaW5nIGxlYXZlLW9uZS1vdXQjIw0KbW9kNC54djEgPC0gY3Jvc3N2YWwobW9kNCwgY3YubWV0aG9kID0gImxvbyIpDQpgYGANCg0KYGBge3J9DQptb2Q0Lnh2MQ0KYGBgDQoNCmBgYHtyIFdBUExTLmhlbDIsIGVjaG8gPSBUUlVFLCByZXN1bHRzID0gRn0NCiMjQ3Jvc3MtdmFsaWRhdGlvbiB1c2luZyBib29zdHJhcGluZyMjDQptb2Q0Lnh2MiA8LSBjcm9zc3ZhbChtb2Q0LCBjdi5tZXRob2QgPSAiYm9vdCIsIG5ib290ID0gMTAwMCkNCmBgYA0KDQpgYGB7cn0NCm1vZDQueHYyDQpgYGANCg0KYGBge3IgV0FQTFMuc3FydDEsIGVjaG8gPSBUUlVFLCByZXN1bHRzID0gRkFMU0V9DQojI0Nyb3NzLXZhbGlkYXRpb24gdXNpbmcgbGVhdmUtb25lLW91dCMjDQptb2Q1Lnh2MSA8LSBjcm9zc3ZhbChtb2Q1LCBjdi5tZXRob2QgPSAibG9vIikNCmBgYA0KDQpgYGB7cn0NCm1vZDUueHYxDQpgYGANCg0KYGBge3IgV0FQTFMuc3FydDIsIGVjaG8gPSBUUlVFLCByZXN1bHRzID0gRn0NCiMjQ3Jvc3MtdmFsaWRhdGlvbiB1c2luZyBib29zdHJhcGluZyMjDQptb2Q1Lnh2MiA8LSBjcm9zc3ZhbChtb2Q1LCBjdi5tZXRob2QgPSAiYm9vdCIsIG5ib290ID0gMTAwMCkNCmBgYA0KDQpgYGB7cn0NCm1vZDUueHYyDQpgYGANCg0KYGBge3IgV0FQTFMubG9nMSwgZWNobyA9IFRSVUUsIHJlc3VsdHMgPSBGQUxTRX0NCiMjQ3Jvc3MtdmFsaWRhdGlvbiB1c2luZyBsZWF2ZS1vbmUtb3V0IyMNCm1vZDYueHYxIDwtIGNyb3NzdmFsKG1vZDYsIGN2Lm1ldGhvZCA9ICJsb28iKQ0KYGBgDQoNCmBgYHtyfQ0KbW9kNi54djENCmBgYA0KDQpgYGB7ciBXQVBMUy5sb2cyLCBlY2hvID0gVFJVRSwgcmVzdWx0cyA9IEZ9DQojI0Nyb3NzLXZhbGlkYXRpb24gdXNpbmcgYm9vc3RyYXBpbmcjIw0KbW9kNi54djIgPC0gY3Jvc3N2YWwobW9kNiwgY3YubWV0aG9kID0gImJvb3QiLCBuYm9vdCA9IDEwMDApDQpgYGANCg0KYGBge3J9DQptb2Q2Lnh2Mg0KYGBgDQo=</div>
 
 
 </div>

@@ -22,6 +22,8 @@ library(gridExtra)
 library(rstatix)
 ```
 
+A series of WA and WA-PLS models were developed using the screened data set (38 sampling sites and 45 diatom taxa) to identify the best calibration model that allows reliable conductivity reconstructions in northern Patagonia.
+
 # **Preprocessing Data** #
 ```{r Loading.data}
 
@@ -31,7 +33,8 @@ speciesCH <- readRDS("speciesCH.rds") ##Chubut River Diatom Data##
 
 names <- readRDS("names.code.rds")   ##Species name code## 
 
-chem <- readRDS("chem.rds")          ##Hidrochemical variables##
+varam <- readRDS("varam.rds")
+chem <- readRDS("chem.rds")          ##Hidrochemical variables Log-Transformed##
 ```
 
 ```{r Combining.data}
@@ -53,9 +56,156 @@ species.inland <- species.inland[, colSums(species.inland) > 0]
 chem.inland <- chem[-c(1:3, 16:18, 34:38),]
 ```
 
+```{r Diatom.data.transformation}
 
+species.inland.hel <- decostand(species.inland, "hellinger")
+species.inland.sqrt <- sqrt(species.inland)
+species.inland.log <- log1p(species.inland)
+```
 
+# **Weighted Averaging** #
+```{r WA}
+mod1 <- WA(
+  species.inland.hel, ##Hellinger tranformed##
+  chem.inland$Cond,
+  tolDW=TRUE
+  )
 
+mod2 <- WA(
+  species.inland.sqrt, ##Square-root tranformed##
+  chem.inland$Cond,
+  tolDW=TRUE
+  )
 
+mod3 <- WA(
+  species.inland.log, ##Log-tranformed##
+  chem.inland$Cond,
+  tolDW=TRUE
+  )
+```
 
+```{r WA.cross.hell1, echo = TRUE, results = FALSE}
+##Cross-validation using leave-one-out##
+mod1.xv1 <- crossval(mod1, cv.method = "loo")
+```
 
+```{r}
+mod1.xv1
+```
+
+```{r WA.cross.hell2, echo = TRUE, results = FALSE}
+##Cross-validation using bootstraping##
+mod1.xv2 <- crossval(mod1, cv.method = "boot", nboot = 1000)
+```
+
+```{r}
+mod1.xv2
+```
+
+```{r WA.cross.square1, echo = TRUE, results = FALSE}
+##Cross-validation using leave-one-out##
+mod2.xv1 <- crossval(mod2, cv.method = "loo")
+```
+
+```{r}
+mod2.xv1
+```
+
+```{r WA.cross.square2, echo = TRUE, results = FALSE}
+##Cross-validation using bootstraping##
+mod2.xv2 <- crossval(mod2, cv.method = "boot", nboot = 1000) 
+```
+
+```{r}
+mod2.xv2
+```
+
+```{r WA.cross.log1, echo = TRUE, results = FALSE}
+##Cross-validation using leave-one-out##
+mod3.xv1 <- crossval(mod3, cv.method = "loo")
+```
+
+```{r}
+mod3.xv1
+```
+
+```{r WA.cross.log2, echo = TRUE, results = FALSE}
+##Cross-validation using Boostraping##
+mod3.xv2 <- crossval(mod3, cv.method = "boot", nboot = 1000)
+```
+
+```{r}
+mod3.xv2
+```
+
+# **Weighted Averaging - Partial Lineal Square** #
+```{r WAPLS}
+mod4 <- WAPLS(
+  species.inland.hel, ##Hellinger tranformed##
+  chem.inland$Cond,
+  )
+
+mod5 <- WAPLS(
+  species.inland.sqrt, ##Square-root tranformed##
+  chem.inland$Cond,
+  )
+
+mod6 <- WAPLS(
+  species.inland.log, ##Log-tranformed##
+  chem.inland$Cond,
+  )
+```
+
+```{r WAPLS.hel1, echo = TRUE, results = FALSE}
+##Cross-validation using leave-one-out##
+mod4.xv1 <- crossval(mod4, cv.method = "loo")
+```
+
+```{r}
+mod4.xv1
+```
+
+```{r WAPLS.hel2, echo = TRUE, results = F}
+##Cross-validation using boostraping##
+mod4.xv2 <- crossval(mod4, cv.method = "boot", nboot = 1000)
+```
+
+```{r}
+mod4.xv2
+```
+
+```{r WAPLS.sqrt1, echo = TRUE, results = FALSE}
+##Cross-validation using leave-one-out##
+mod5.xv1 <- crossval(mod5, cv.method = "loo")
+```
+
+```{r}
+mod5.xv1
+```
+
+```{r WAPLS.sqrt2, echo = TRUE, results = F}
+##Cross-validation using boostraping##
+mod5.xv2 <- crossval(mod5, cv.method = "boot", nboot = 1000)
+```
+
+```{r}
+mod5.xv2
+```
+
+```{r WAPLS.log1, echo = TRUE, results = FALSE}
+##Cross-validation using leave-one-out##
+mod6.xv1 <- crossval(mod6, cv.method = "loo")
+```
+
+```{r}
+mod6.xv1
+```
+
+```{r WAPLS.log2, echo = TRUE, results = F}
+##Cross-validation using boostraping##
+mod6.xv2 <- crossval(mod6, cv.method = "boot", nboot = 1000)
+```
+
+```{r}
+mod6.xv2
+```
