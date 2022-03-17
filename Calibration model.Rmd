@@ -56,6 +56,9 @@ species.inland <- species.inland[, colSums(species.inland) > 0]
 chem.inland <- chem[-c(1:3, 16:18, 34:38),]
 ```
 
+
+For comparison purposes, models with Hellinger, square-root and logarithmic transformation were applied respectively, to develop a calibration model of conductivity.
+
 ```{r Diatom.data.transformation}
 
 species.inland.hel <- decostand(species.inland, "hellinger")
@@ -209,3 +212,56 @@ mod6.xv2 <- crossval(mod6, cv.method = "boot", nboot = 1000)
 ```{r}
 mod6.xv2
 ```
+
+
+# **Observed vs Inferred Plot** #
+
+
+Comparison of measured and predicted conductivities revealed that the simple WA with inverse deshrinking, tolerance down-weighting and square-root transformation provided the best performance. This model showed the highest r2 jack (0.97), the lowest RMSEP (0.0521) and lowest maximum bias (0.1901). In contrast, models based on WA-PLS methods did not outperform the statistic parameters shown by the simple WA.
+
+```{r, fig.align="center"}
+best.model <- cbind(
+  chem.inland$Cond,
+  as.data.frame(mod2$fitted.values[, 3])
+)
+
+names(best.model) <- c("Observed", "Inferred")
+
+ggplot(best.model,
+       aes(x = Observed, y = Inferred)
+       )+
+  geom_point(
+    size=3, 
+    pch = 3
+    )+
+  geom_smooth(
+    method = lm
+    )+
+  labs(
+    x= "Observed Conductivity",
+    y = "Inferred Conductivity"
+    )+
+  theme_minimal()
+```
+
+## Assumptions of Linear Regression ##
+```{r Assumptions.Linear.Regression, fig.align="center"}
+
+library(ggfortify)
+
+reg <- lm(
+  Inferred ~ Observed,
+  data = best.model
+)
+
+autoplot(
+  reg
+  ) +
+  geom_point(
+    size = 2,
+    alpha = 0.5,
+    col = "blue"
+    ) + 
+  theme_bw()
+```
+
