@@ -265,3 +265,29 @@ autoplot(
   theme_bw()
 ```
 
+## Plot of species WA optima and tolerance
+```{r Plot.Optima, fig.align="center", fig.width=6, fig.height=12}
+library(palaeoSig)
+
+names.mod <- readRDS("names.mod.rds")##names and codes of species in the model##
+names(species.inland) <- names.mod$Code
+
+par(
+  mar = c(1.1,1.1,1.1,1.1)
+  ) #extra space on left side of plot for names##
+
+centipede_plot(
+  mod2,
+  spp = species.inland,
+  minN2 = 3
+  ) +
+  geom_point(
+    col = "red"
+  ) +
+  labs(
+    y = "Diatom-inferred Conductivity (mS/cm)"
+  ) +
+  theme_minimal()
+
+```
+
