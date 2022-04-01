@@ -3,10 +3,11 @@ title: "Diatom-based Calibration Model"
 author: "Vélez-Agudelo Camilo"
 date: "8/3/2022"
 output:
-  html_notebook:
-    code_folding: "show"
-    toc: yes
-    toc_float: yes
+  html_document:
+   code_folding: "show"
+   toc: yes
+   toc_float: yes
+   keep_md: true
 ---
 
 ```{r setup, include=FALSE}
@@ -266,14 +267,16 @@ autoplot(
 ```
 
 ## Plot of species WA optima and tolerance
-```{r Plot.Optima, fig.align="center", fig.width=6, fig.height=12}
+
+```{r Plot.Optima, fig.align = "center", fig.width=6, fig.height=10}
 library(palaeoSig)
 
 names.mod <- readRDS("names.mod.rds")##names and codes of species in the model##
 names(species.inland) <- names.mod$Code
 
 par(
-  mar = c(1.1,1.1,1.1,1.1)
+  mar = c(1.1,1.1,1.1,1.1),
+  mfrow = c(1, 2)
   ) #extra space on left side of plot for names##
 
 centipede_plot(
@@ -288,6 +291,5 @@ centipede_plot(
     y = "Diatom-inferred Conductivity (mS/cm)"
   ) +
   theme_minimal()
-
 ```
 
